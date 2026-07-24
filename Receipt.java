@@ -28,6 +28,6 @@ public class Receipt {
     @Override
     public String toString() {
         return "Receipt " + receiptId + " | Paid: $" + String.format("%.2f", totalAmount) + 
-               " | Verified Exit: " + (verifiedAtExit ? "Yes" : "No");
+               " | Exit Verified: " + (verifiedAtExit ? "Yes" : "No");
     }
 }

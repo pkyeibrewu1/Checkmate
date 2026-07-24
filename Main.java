@@ -1,44 +1,45 @@
 public class Main {
     public static void main(String[] args) {
-        // 1. Create Restaurant
-        Restaurant restaurant = new Restaurant("Checkmate Bistro");
-
-        // 2. Add 10 tables
-        for (int i = 1; i <= 10; i++) {
+        // Setup Restaurant & Menu
+        Restaurant restaurant = new Restaurant("CheckMate Diner");
+        for (int i = 1; i <= 5; i++) {
             restaurant.addTable(new Table(i));
         }
 
-        // 3. Create 5 menu items
-        MenuItem burger = new MenuItem(1, "Burger", 12.50);
-        MenuItem fries = new MenuItem(2, "Fries", 4.50);
-        MenuItem coke = new MenuItem(3, "Coke", 2.50);
-        MenuItem steak = new MenuItem(4, "Steak", 24.99);
-        MenuItem salad = new MenuItem(5, "Salad", 8.99);
+        MenuItem burger = new MenuItem(1, "Burger", 11.99);
+        MenuItem fries = new MenuItem(2, "Fries", 3.99);
+        MenuItem drink = new MenuItem(3, "Drink", 2.49);
 
-        restaurant.addMenuItem(burger);
-        restaurant.addMenuItem(fries);
-        restaurant.addMenuItem(coke);
-        restaurant.addMenuItem(steak);
-        restaurant.addMenuItem(salad);
+        System.out.println("=== STARTING SERVER SHIFT WORKFLOW ===\n");
 
-        // 4. Create an order for Table 2
-        Table table2 = restaurant.getTables().get(1); // Index 1 is Table 2
-        Order order101 = new Order(101, table2.getTableNumber());
+        // 1. Seat Table 4
+        restaurant.seatTable(4);
 
-        // 5. Add menu items to order
-        order101.addItem(burger);
-        order101.addItem(fries);
-        order101.addItem(coke);
+        // 2. Create Order
+        restaurant.createOrder(4);
 
-        // 6. Assign order to table
-        table2.setCurrentOrder(order101);
+        // 3. Add Items
+        restaurant.addItemToOrder(4, burger);
+        restaurant.addItemToOrder(4, fries);
+        restaurant.addItemToOrder(4, drink);
 
-        // 7. Process payment & create receipt
-        order101.setPaid(true);
-        Receipt receipt = new Receipt("CM-0001", order101);
-        restaurant.addReceipt(receipt);
+        // 4. Request Bill
+        restaurant.requestBill(4);
 
-        // 8. Print tree output
-        restaurant.printRestaurantTree();
+        // 5. Pay Bill & Generate Receipt
+        Receipt receipt = restaurant.recordPayment(4);
+
+        // 6. Verify Receipt at Exit
+        if (receipt != null) {
+            restaurant.verifyReceipt(receipt.getReceiptId());
+            
+            // Testing double-use exit prevention
+            restaurant.verifyReceipt(receipt.getReceiptId()); 
+        }
+
+        // 7. Clear Table
+        restaurant.clearTable(4);
+
+        System.out.println("\n=== WORKFLOW COMPLETE ===");
     }
 }

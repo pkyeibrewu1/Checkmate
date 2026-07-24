@@ -11,16 +11,22 @@ public class Table {
 
     public int getTableNumber() { return tableNumber; }
     public boolean isOccupied() { return isOccupied; }
-    public void setOccupied(boolean occupied) { isOccupied = occupied; }
-    
     public Order getCurrentOrder() { return currentOrder; }
-    public void setCurrentOrder(Order currentOrder) { 
-        this.currentOrder = currentOrder; 
-        this.isOccupied = (currentOrder != null);
+
+    public void seatTable() {
+        this.isOccupied = true;
     }
 
-    public boolean isPaid() {
-        return currentOrder != null && currentOrder.isPaid();
+    public void clearTable() {
+        this.isOccupied = false;
+        this.currentOrder = null;
+    }
+
+    public void setCurrentOrder(Order currentOrder) { 
+        this.currentOrder = currentOrder; 
+        if (currentOrder != null) {
+            this.isOccupied = true;
+        }
     }
 
     @Override
