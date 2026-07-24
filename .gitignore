@@ -1,0 +1,10 @@
+# Java compiled output
+*.class
+
+# CheckMate local storage
+*.ser
+
+# IDE configuration files
+.vscode/
+.idea/
+*.iml
