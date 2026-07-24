@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Order {
+public class Order implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int orderId;
     private int tableNumber;
     private List<MenuItem> items;

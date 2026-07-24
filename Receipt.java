@@ -1,7 +1,10 @@
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Receipt {
+public class Receipt implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String receiptId;
     private Order order;
     private double totalAmount;
