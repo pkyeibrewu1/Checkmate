@@ -34,6 +34,8 @@ Dine-and-dash incidents cost independent restaurants thousands of dollars annual
 * **Version Control**: Git & GitHub
 
 ---
+![CheckMate Demo](screenshots/1.png)
+---
 
 ## 🚀 Getting Started
 
