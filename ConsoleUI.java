@@ -211,7 +211,22 @@ public class ConsoleUI {
     private void handleVerifyReceipt() {
         System.out.print("Enter Receipt ID to verify at exit: ");
         String receiptId = scanner.nextLine().trim();
-        restaurant.verifyReceipt(receiptId);
+        
+        boolean verified = restaurant.verifyReceipt(receiptId);
+        if (verified) {
+            // Find which table had this receipt and offer to clear it
+            System.out.print("Would you like to clear this table now? (y/n): ");
+            String ans = scanner.nextLine().trim();
+            if (ans.equalsIgnoreCase("y")) {
+                // Find table matching order in receipt and clear
+                for (Table table : restaurant.getTables()) {
+                    if (table.getCurrentOrder() != null && table.getCurrentOrder().isPaid()) {
+                        restaurant.clearTable(table.getTableNumber());
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void handleClearTable() {
@@ -223,11 +238,12 @@ public class ConsoleUI {
     }
 
     private int readInt() {
+    while (true) {
         try {
             return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("Invalid numerical input.");
-            return -1;
+            System.out.print("Invalid entry. Please enter a valid number: ");
         }
     }
+}
 }
