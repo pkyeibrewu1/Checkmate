@@ -9,15 +9,6 @@ public class Restaurant {
     private int nextOrderId = 100;
     private int nextReceiptId = 1000;
 
-    public MenuItem findMenuItemById(int id) {
-    for (MenuItem item : menu) {
-        if (item.getId() == id) {
-            return item;
-        }
-    }
-    return null;
-    }
-
     public Restaurant(String name) {
         this.name = name;
         this.tables = new ArrayList<>();
@@ -37,7 +28,15 @@ public class Restaurant {
         return null;
     }
 
-    // Task 1: Seat a Table
+    public MenuItem findMenuItemById(int id) {
+        for (MenuItem item : menu) {
+            if (item.getId() == id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     public boolean seatTable(int tableNumber) {
         Table table = findTable(tableNumber);
         if (table != null && !table.isOccupied()) {
@@ -49,7 +48,6 @@ public class Restaurant {
         return false;
     }
 
-    // Task 2: Create an Order
     public Order createOrder(int tableNumber) {
         Table table = findTable(tableNumber);
         if (table != null && table.isOccupied() && table.getCurrentOrder() == null) {
@@ -62,7 +60,6 @@ public class Restaurant {
         return null;
     }
 
-    // Task 3: Add Item to Order
     public void addItemToOrder(int tableNumber, MenuItem item) {
         Table table = findTable(tableNumber);
         if (table != null && table.getCurrentOrder() != null) {
@@ -71,7 +68,6 @@ public class Restaurant {
         }
     }
 
-    // Task 4: Request the Bill
     public void requestBill(int tableNumber) {
         Table table = findTable(tableNumber);
         if (table != null && table.getCurrentOrder() != null) {
@@ -81,7 +77,6 @@ public class Restaurant {
         }
     }
 
-    // Task 5: Record Payment & Generate Receipt
     public Receipt recordPayment(int tableNumber) {
         Table table = findTable(tableNumber);
         if (table != null && table.getCurrentOrder() != null) {
@@ -96,7 +91,6 @@ public class Restaurant {
         return null;
     }
 
-    // Task 6: Verify the Receipt (Dine-and-Dash Security Gate)
     public boolean verifyReceipt(String receiptId) {
         System.out.println("\n--- Security Verification Gate ---");
         for (Receipt receipt : receipts) {
@@ -116,12 +110,46 @@ public class Restaurant {
         return false;
     }
 
-    // Task 7: Free the Table
     public void clearTable(int tableNumber) {
         Table table = findTable(tableNumber);
         if (table != null && table.isOccupied()) {
             table.clearTable();
             System.out.println("Table " + tableNumber + " has been cleared and is now available.");
+        }
+    }
+
+    public List<Table> getTables() { return tables; }
+    public List<MenuItem> getMenu() { return menu; }
+
+    public void printRestaurantTree() {
+        System.out.println("\n=== HIERARCHY TREE ===");
+        System.out.println(name);
+        for (int i = 0; i < tables.size(); i++) {
+            Table table = tables.get(i);
+            boolean isLastTable = (i == tables.size() - 1);
+            String prefix = isLastTable ? "└── " : "├── ";
+            System.out.println(prefix + table);
+
+            if (table.getCurrentOrder() != null) {
+                Order order = table.getCurrentOrder();
+                String indent = isLastTable ? "    " : "│   ";
+                System.out.println(indent + "└── Order #" + order.getOrderId());
+
+                List<MenuItem> items = order.getItems();
+                for (MenuItem item : items) {
+                    System.out.println(indent + "      ├── " + item.getName());
+                }
+
+                System.out.println(indent + "      Total: $" + String.format("%.2f", order.calculateTotal()));
+                System.out.println(indent + "      Status: " + order.getStatus());
+
+                for (Receipt r : receipts) {
+                    if (r.getOrder().getOrderId() == order.getOrderId()) {
+                        System.out.println(indent + "      Receipt: " + r.getReceiptId());
+                        break;
+                    }
+                }
+            }
         }
     }
 }

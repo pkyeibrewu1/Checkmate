@@ -64,7 +64,6 @@ public class ConsoleUI {
         System.out.println("=============================");
     }
 
-    // Task 2: Seat a Customer
     private void handleSeatTable() {
         System.out.print("Enter Table Number to seat: ");
         int tableNum = readInt();
@@ -76,7 +75,6 @@ public class ConsoleUI {
         }
     }
 
-    // Task 3: View Restaurant Status Dashboard
     private void handleViewTables() {
         System.out.println("\n--- RESTAURANT DASHBOARD ---");
         for (Table table : restaurant.getTables()) {
@@ -103,7 +101,6 @@ public class ConsoleUI {
         }
     }
 
-    // Task 4: Manage Orders
     private void handleManageOrder() {
         System.out.print("Enter Table Number: ");
         int tableNum = readInt();
@@ -196,7 +193,6 @@ public class ConsoleUI {
         }
     }
 
-    // Task 5: Payment Processing
     private void handleProcessPayment() {
         System.out.print("Enter Table Number to pay: ");
         int tableNum = readInt();
@@ -212,14 +208,12 @@ public class ConsoleUI {
         }
     }
 
-    // Task 6: Receipt Verification
     private void handleVerifyReceipt() {
         System.out.print("Enter Receipt ID to verify at exit: ");
         String receiptId = scanner.nextLine().trim();
         restaurant.verifyReceipt(receiptId);
     }
 
-    // Task 7: Clear Table
     private void handleClearTable() {
         System.out.print("Enter Table Number to clear: ");
         int tableNum = readInt();

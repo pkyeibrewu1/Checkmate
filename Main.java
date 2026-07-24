@@ -1,45 +1,22 @@
 public class Main {
     public static void main(String[] args) {
-        // Setup Restaurant & Menu
-        Restaurant restaurant = new Restaurant("CheckMate Diner");
-        for (int i = 1; i <= 5; i++) {
+        // Initialize Restaurant
+        Restaurant restaurant = new Restaurant("Checkmate Bistro");
+
+        // Populate Default Tables (1 to 10)
+        for (int i = 1; i <= 10; i++) {
             restaurant.addTable(new Table(i));
         }
 
-        MenuItem burger = new MenuItem(1, "Burger", 11.99);
-        MenuItem fries = new MenuItem(2, "Fries", 3.99);
-        MenuItem drink = new MenuItem(3, "Drink", 2.49);
+        // Populate Default Menu Catalog
+        restaurant.addMenuItem(new MenuItem(101, "Classic Burger", 12.99));
+        restaurant.addMenuItem(new MenuItem(102, "Crispy Fries", 4.50));
+        restaurant.addMenuItem(new MenuItem(103, "Fountain Soda", 2.50));
+        restaurant.addMenuItem(new MenuItem(104, "Ribeye Steak", 26.99));
+        restaurant.addMenuItem(new MenuItem(105, "Caesar Salad", 8.99));
 
-        System.out.println("=== STARTING SERVER SHIFT WORKFLOW ===\n");
-
-        // 1. Seat Table 4
-        restaurant.seatTable(4);
-
-        // 2. Create Order
-        restaurant.createOrder(4);
-
-        // 3. Add Items
-        restaurant.addItemToOrder(4, burger);
-        restaurant.addItemToOrder(4, fries);
-        restaurant.addItemToOrder(4, drink);
-
-        // 4. Request Bill
-        restaurant.requestBill(4);
-
-        // 5. Pay Bill & Generate Receipt
-        Receipt receipt = restaurant.recordPayment(4);
-
-        // 6. Verify Receipt at Exit
-        if (receipt != null) {
-            restaurant.verifyReceipt(receipt.getReceiptId());
-            
-            // Testing double-use exit prevention
-            restaurant.verifyReceipt(receipt.getReceiptId()); 
-        }
-
-        // 7. Clear Table
-        restaurant.clearTable(4);
-
-        System.out.println("\n=== WORKFLOW COMPLETE ===");
+        // Launch Interactive Console UI
+        ConsoleUI ui = new ConsoleUI(restaurant);
+        ui.start();
     }
 }
