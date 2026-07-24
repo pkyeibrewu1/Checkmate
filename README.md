@@ -26,6 +26,24 @@ Dine-and-dash incidents cost independent restaurants thousands of dollars annual
 * **Persistence**: Object state serialized to disk using `java.io.Serializable`.
 
 ---
+### 🏗️ Architecture Diagram
+
+```
++-----------------+        1..n       +-----------------+
+|   Restaurant    |-------------------|      Table      |
++-----------------+                   +-----------------+
+         | 1..n                                | 0..1
+         |                                     |
++-----------------+                   +-----------------+
+|     Receipt     |                   |      Order      |
++-----------------+                   +-----------------+
+                                               | 1..n
+                                      +-----------------+
+                                      |    MenuItem     |
+                                      +-----------------+
+```
+
+---
 
 ## 🛠️ Built With
 
