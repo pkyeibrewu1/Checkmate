@@ -67,7 +67,6 @@ public class ConsoleUI {
     private void handleSeatTable() {
         System.out.print("Enter Table Number to seat: ");
         int tableNum = readInt();
-        if (tableNum == -1) return;
 
         boolean success = restaurant.seatTable(tableNum);
         if (success) {
@@ -104,7 +103,6 @@ public class ConsoleUI {
     private void handleManageOrder() {
         System.out.print("Enter Table Number: ");
         int tableNum = readInt();
-        if (tableNum == -1) return;
 
         Table table = restaurant.findTable(tableNum);
         if (table == null || !table.isOccupied() || table.getCurrentOrder() == null) {
@@ -196,7 +194,6 @@ public class ConsoleUI {
     private void handleProcessPayment() {
         System.out.print("Enter Table Number to pay: ");
         int tableNum = readInt();
-        if (tableNum == -1) return;
 
         Receipt receipt = restaurant.recordPayment(tableNum);
         if (receipt != null) {
@@ -211,16 +208,15 @@ public class ConsoleUI {
     private void handleVerifyReceipt() {
         System.out.print("Enter Receipt ID to verify at exit: ");
         String receiptId = scanner.nextLine().trim();
-        
+
         boolean verified = restaurant.verifyReceipt(receiptId);
         if (verified) {
-            // Find which table had this receipt and offer to clear it
-            System.out.print("Would you like to clear this table now? (y/n): ");
+            System.out.print("Would you like to clear the associated table now? (y/n): ");
             String ans = scanner.nextLine().trim();
             if (ans.equalsIgnoreCase("y")) {
-                // Find table matching order in receipt and clear
+                // Find and clear the specific table tied to this verified receipt
                 for (Table table : restaurant.getTables()) {
-                    if (table.getCurrentOrder() != null && table.getCurrentOrder().isPaid()) {
+                    if (table.getCurrentOrder() != null && table.getCurrentOrder().getStatus() == OrderStatus.PAID) {
                         restaurant.clearTable(table.getTableNumber());
                         break;
                     }
@@ -232,18 +228,17 @@ public class ConsoleUI {
     private void handleClearTable() {
         System.out.print("Enter Table Number to clear: ");
         int tableNum = readInt();
-        if (tableNum == -1) return;
 
         restaurant.clearTable(tableNum);
     }
 
     private int readInt() {
-    while (true) {
-        try {
-            return Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.print("Invalid entry. Please enter a valid number: ");
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid entry. Please enter a valid number: ");
+            }
         }
     }
-}
 }
