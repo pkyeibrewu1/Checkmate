@@ -1,4 +1,3 @@
-```markdown
 # 🛡️ CheckMate – Restaurant Order & Exit Verification System
 
 CheckMate is a full-stack Spring Boot application and real-time web dashboard designed to combat industry-wide **dine-and-dash incidents**. By pairing live floor management with an unguessable single-use exit verification protocol, CheckMate ensures customers can only leave the venue after their bill has been fully settled and validated.
