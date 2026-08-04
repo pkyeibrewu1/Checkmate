@@ -50,5 +50,5 @@ Dine-and-dash incidents cost independent venues thousands of dollars annually an
 
 1. **Clone the repository**:
    ```bash
-   git clone [https://github.com/pkyeibrewu1/Checkmate.git](https://github.com/pkyeibrewu1/Checkmate.git)
+   git clone [https://github.com/pkyeibrewu1/Checkmate.git]
    cd Checkmate
