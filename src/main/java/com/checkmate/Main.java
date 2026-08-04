@@ -1,3 +1,4 @@
+package com.checkmate;
 public class Main {
     public static void main(String[] args) {
         // 1. Try loading saved data from file

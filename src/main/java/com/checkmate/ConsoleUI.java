@@ -1,3 +1,4 @@
+package com.checkmate;
 import java.util.Scanner;
 
 public class ConsoleUI {

@@ -1,6 +1,9 @@
+package com.checkmate;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Restaurant implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -11,7 +14,6 @@ public class Restaurant implements Serializable {
     private List<MenuItem> menu;
     private List<Receipt> receipts;
     private int nextOrderId = 100;
-    private int nextReceiptId = 1000;
 
     public Restaurant(String name) {
         this.name = name;
@@ -20,8 +22,8 @@ public class Restaurant implements Serializable {
         this.receipts = new ArrayList<>();
     }
 
-    // --- PERSISTENCE (SPRINT 4) ---
-    
+    // --- PERSISTENCE ---
+
     public void saveData() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
             oos.writeObject(this);
@@ -33,7 +35,7 @@ public class Restaurant implements Serializable {
     public static Restaurant loadData() {
         File file = new File(DATA_FILE);
         if (!file.exists()) {
-            return null; // Return null if no previous save exists
+            return null;
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -74,7 +76,7 @@ public class Restaurant implements Serializable {
         return null;
     }
 
-    // --- BUSINESS LOGIC (WITH SPRINT 5 ERROR HANDLING) ---
+    // --- BUSINESS LOGIC ---
 
     public boolean seatTable(int tableNumber) {
         Table table = findTable(tableNumber);
@@ -146,36 +148,70 @@ public class Restaurant implements Serializable {
         }
 
         Order order = table.getCurrentOrder();
+
+        // Prevent payment on empty orders ($0.00 total)
+        if (order.getItems().isEmpty() || order.calculateTotal() <= 0) {
+            System.out.println("Error: Cannot process payment for an empty order at Table " + tableNumber);
+            return null;
+        }
+
         if (order.getStatus() == OrderStatus.PAID) {
             System.out.println("Error: Order for Table " + tableNumber + " has already been paid!");
             return null;
         }
 
         order.setStatus(OrderStatus.PAID);
-        Receipt receipt = new Receipt("CM-" + nextReceiptId++, order);
+        
+        // Generate unpredictable 6-character random code (e.g., CM-8F2K9P)
+        String randomCode = generateRandomReceiptId();
+        Receipt receipt = new Receipt(randomCode, order);
         receipts.add(receipt);
+
         System.out.println("Payment received for Table " + tableNumber + ". Generated " + receipt.getReceiptId());
         saveData();
         return receipt;
+    }
+
+    // Generates an unguessable 6-character alphanumeric receipt token
+    private String generateRandomReceiptId() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder("CM-");
+        Random rnd = new Random();
+        
+        for (int i = 0; i < 6; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 
     public boolean verifyReceipt(String receiptId) {
         System.out.println("\n--- Security Verification Gate ---");
         for (Receipt receipt : receipts) {
             if (receipt.getReceiptId().equalsIgnoreCase(receiptId)) {
+                // Block already-scanned receipts
                 if (receipt.isVerifiedAtExit()) {
                     System.out.println("Status: DENIED | Reason: Receipt " + receiptId + " was already used for exit!");
                     return false;
                 }
-                if (receipt.getOrder().getStatus() == OrderStatus.PAID) {
+
+                // Verify status is PAID and amount > $0.00
+                if (receipt.getOrder().getStatus() == OrderStatus.PAID && receipt.getTotalAmount() > 0) {
                     receipt.setVerifiedAtExit(true);
-                    System.out.println("Status: APPROVED | Payment Verified. Exit Allowed for Receipt " + receiptId);
+                    
+                    // Automatically clear the table upon valid exit verification
+                    int tableToClear = receipt.getOrder().getTableNumber();
+                    clearTable(tableToClear);
+
+                    System.out.println("Status: APPROVED | Payment Verified. Exit Allowed for Receipt " + receiptId + ". Table " + tableToClear + " automatically cleared!");
                     saveData();
                     return true;
+                } else {
+                    System.out.println("Status: DENIED | Unpaid or invalid receipt amount.");
+                    return false;
                 }
             }
         }
-        System.out.println("Status: DENIED | Invalid or unpaid receipt ID: " + receiptId);
+        System.out.println("Status: DENIED | Invalid receipt ID: " + receiptId);
         return false;
     }
 

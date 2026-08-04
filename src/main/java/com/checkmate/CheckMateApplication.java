@@ -1,4 +1,4 @@
-public package com.checkmate;
+package com.checkmate;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +8,4 @@ public class CheckMateApplication {
     public static void main(String[] args) {
         SpringApplication.run(CheckMateApplication.class, args);
     }
-} {
-    
 }

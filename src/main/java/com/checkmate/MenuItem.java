@@ -1,3 +1,4 @@
+package com.checkmate;
 import java.io.Serializable;
 
 public class MenuItem implements Serializable {
