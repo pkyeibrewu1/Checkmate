@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CheckMate – Exit Verification Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-table { background: #1e293b; border: 2px solid #334155; border-radius: 12px; transition: transform 0.2s; }
+        .card-table:hover { transform: translateY(-3px); }
+        .status-available { color: #4ade80; font-weight: bold; }
+        .status-occupied { color: #f87171; font-weight: bold; }
+        .status-paid { color: #fbbf24; font-weight: bold; }
+        .gate-card { background: #1e293b; border: 2px solid #38bdf8; border-radius: 12px; }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container">
+        <header class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
+            <h1 class="fw-bold text-info">🛡️ CheckMate Dashboard</h1>
+            <span class="badge bg-primary fs-6">Live Restaurant State</span>
+        </header>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <h3 class="mb-3">Table Floor Map</h3>
+                <div id="table-grid" class="row g-3">
+                    </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="gate-card p-4 mb-4">
+                    <h4 class="text-info mb-3">🚪 Exit Security Verification Gate</h4>
+                    <p class="text-muted small">Enter Receipt ID presented by customer at venue exit:</p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="receipt-input" class="form-control" placeholder="e.g. CM-1000">
+                        <button class="btn btn-info" onclick="verifyExit()">Verify</button>
+                    </div>
+                    <div id="gate-result" class="alert d-none"></div>
+                </div>
+
+                <div class="card bg-dark text-white p-3 border-secondary">
+                    <h5>Quick Menu Items</h5>
+                    <ul id="menu-list" class="list-group list-group-flush mt-2"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function loadDashboard() {
+            const res = await fetch(`${API_BASE}/tables`);
+            const tables = await res.json();
+            const grid = document.getElementById('table-grid');
+            grid.innerHTML = '';
+
+            tables.forEach(table => {
+                let statusText = 'Available';
+                let statusClass = 'status-available';
+                let actionBtn = `<button class="btn btn-sm btn-outline-success mt-2" onclick="seatTable(${table.tableNumber})">Seat Customer</button>`;
+
+                if (table.occupied) {
+                    statusText = table.currentOrder && table.currentOrder.status === 'PAID' ? 'Paid (Pending Exit)' : 'Occupied';
+                    statusClass = table.currentOrder && table.currentOrder.status === 'PAID' ? 'status-paid' : 'status-occupied';
+                    
+                    actionBtn = `
+                        <div class="btn-group-vertical w-100 mt-2">
+                            <button class="btn btn-sm btn-outline-warning mb-1" onclick="addBurger(${table.tableNumber})">+ Add Burger ($12.99)</button>
+                            <button class="btn btn-sm btn-outline-info mb-1" onclick="payBill(${table.tableNumber})">Process Payment</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="clearTable(${table.tableNumber})">Clear Table</button>
+                        </div>
+                    `;
+                }
+
+                grid.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="card card-table p-3 text-center">
+                            <h5>Table ${table.tableNumber}</h5>
+                            <span class="${statusClass}">${statusText}</span>
+                            <div class="mt-2 text-muted small">
+                                ${table.currentOrder ? `Order Total: $${table.currentOrder.items.reduce((a, b) => a + b.price, 0).toFixed(2)}` : 'No active order'}
+                            </div>
+                            ${actionBtn}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function seatTable(num) {
+            await fetch(`${API_BASE}/seat/${num}`, { method: 'POST' });
+            loadDashboard();
+        }
+
+        async function addBurger(num) {
+            await fetch(`${API_BASE}/order/add?tableNumber=${num}&itemId=101`, { method: 'POST' });
+            loadDashboard();
+        }
+
+        async function payBill(num) {
+            const res = await fetch(`${API_BASE}/pay/${num}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert(`Payment Success! Receipt Generated: ${data.receiptId}`);
+            } else {
+                alert(data.message || 'Payment failed');
+            }
+            loadDashboard();
+        }
+
+        async function verifyExit() {
+            const id = document.getElementById('receipt-input').value.trim();
+            if (!id) return;
+
+            const res = await fetch(`${API_BASE}/verify?receiptId=${id}`, { method: 'POST' });
+            const data = await res.json();
+            const resultDiv = document.getElementById('gate-result');
+            resultDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+
+            if (data.approved) {
+                resultDiv.classList.add('alert-success');
+                resultDiv.innerText = '✅ APPROVED: Valid receipt. Exit allowed.';
+            } else {
+                resultDiv.classList.add('alert-danger');
+                resultDiv.innerText = '❌ DENIED: Invalid, unpaid, or already verified receipt!';
+            }
+            loadDashboard();
+        }
+
+        async function clearTable(num) {
+            await fetch(`${API_BASE}/clear/${num}`, { method: 'POST' });
+            loadDashboard();
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>
